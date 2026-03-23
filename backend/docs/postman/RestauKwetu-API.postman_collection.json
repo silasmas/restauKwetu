@@ -1,0 +1,299 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-restaukwetu-api",
+    "name": "Resto Kwetu — API",
+    "description": "Collection complète pour l'API REST de Resto Kwetu.\n\n**Dossiers** : Authentification, Restaurant (CRUD), Menu, Catégories, Plats.\n\n**Variables de collection**\n- `base_url` : URL de l'app Laravel\n- `token` : jeton Bearer Sanctum\n- `restaurant_id` : id du restaurant (défaut 1)\n- `categorie` : slug ou id d'une catégorie\n- `plat` : slug ou id d'un plat",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:3000" },
+    { "key": "token", "value": "" },
+    { "key": "restaurant_id", "value": "1" },
+    { "key": "categorie", "value": "entrees" },
+    { "key": "plat", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "Utilisateur connecté (Sanctum)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/utilisateur",
+              "host": ["{{base_url}}"],
+              "path": ["api", "utilisateur"]
+            },
+            "description": "GET `/api/utilisateur` — retourne l'utilisateur authentifié via Sanctum. 401 si non authentifié."
+          }
+        },
+        {
+          "name": "Utilisateur (alias /api/user)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user"]
+            },
+            "description": "GET `/api/user` — alias anglophone de `/api/utilisateur`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Restaurant",
+      "description": "CRUD pour la fiche de présentation du restaurant.",
+      "item": [
+        {
+          "name": "Liste des restaurants",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/restaurant",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "restaurant"]
+            },
+            "description": "GET `/api/v1/restaurant` — retourne tous les restaurants (en pratique un seul enregistrement)."
+          }
+        },
+        {
+          "name": "Détail restaurant",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/restaurant/{{restaurant_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "restaurant", "{{restaurant_id}}"]
+            },
+            "description": "GET `/api/v1/restaurant/{id}` — détail complet d'un restaurant."
+          }
+        },
+        {
+          "name": "Créer un restaurant",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Resto Kwetu\",\n  \"slogan\": \"Lounge Bar, terrasse-piscine et salon privé\",\n  \"description\": \"Lounge Bar, terrasse-piscine et salon privé. Un cadre unique à Kinshasa.\",\n  \"email\": null,\n  \"phone\": \"+243 892 959 640\",\n  \"address\": \"88, Avenue Nguma 3, Ngaliema, Macampagne (Ref : en diagonale d'Allée Verte)\",\n  \"city\": \"Kinshasa\",\n  \"country\": \"Congo (RDC)\",\n  \"latitude\": -4.3217,\n  \"longitude\": 15.2663,\n  \"currency_code\": \"USD\",\n  \"timezone\": \"Africa/Kinshasa\",\n  \"opening_hours\": {\n    \"Lundi\": \"08:00 – 22:30\",\n    \"Mardi\": \"08:00 – 22:30\",\n    \"Mercredi\": \"08:00 – 22:30\",\n    \"Jeudi\": \"08:00 – 22:30\",\n    \"Vendredi\": \"08:00 – 22:30\",\n    \"Samedi\": \"08:00 – 22:30\",\n    \"Dimanche\": \"08:00 – 22:30\"\n  },\n  \"social_links\": {\n    \"facebook\": \"https://facebook.com/restokwetu\",\n    \"instagram\": \"https://instagram.com/restokwetu\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/restaurant",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "restaurant"]
+            },
+            "description": "POST `/api/v1/restaurant` — champs requis : `name`, `currency_code`, `timezone`. Retourne 201 + la ressource créée."
+          }
+        },
+        {
+          "name": "Mettre à jour (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Resto Kwetu\",\n  \"slogan\": \"Lounge Bar, terrasse-piscine et salon privé\",\n  \"phone\": \"+243 892 959 640\",\n  \"currency_code\": \"USD\",\n  \"timezone\": \"Africa/Kinshasa\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/restaurant/{{restaurant_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "restaurant", "{{restaurant_id}}"]
+            },
+            "description": "PUT `/api/v1/restaurant/{id}` — remplacement complet. Les champs `name`, `currency_code`, `timezone` restent requis."
+          }
+        },
+        {
+          "name": "Mise à jour partielle (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slogan\": \"Nouveau slogan mis à jour\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/restaurant/{{restaurant_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "restaurant", "{{restaurant_id}}"]
+            },
+            "description": "PATCH `/api/v1/restaurant/{id}` — mise à jour partielle, seuls les champs envoyés sont modifiés."
+          }
+        },
+        {
+          "name": "Supprimer un restaurant",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/restaurant/{{restaurant_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "restaurant", "{{restaurant_id}}"]
+            },
+            "description": "DELETE `/api/v1/restaurant/{id}` — supprime le restaurant. Retourne 204."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "Carte complète",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/menu",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "menu"]
+            },
+            "description": "GET `/api/v1/menu` — catégories actives avec plats disponibles et médias."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catégories",
+      "item": [
+        {
+          "name": "Liste des catégories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories?actives=true&avec_plats=false&disponibles_uniquement=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "categories"],
+              "query": [
+                {
+                  "key": "actives",
+                  "value": "true",
+                  "description": "Filtrer les catégories actives"
+                },
+                {
+                  "key": "avec_plats",
+                  "value": "false",
+                  "description": "Inclure les plats dans chaque catégorie"
+                },
+                {
+                  "key": "disponibles_uniquement",
+                  "value": "true",
+                  "description": "Uniquement les plats disponibles (si avec_plats)"
+                }
+              ]
+            },
+            "description": "GET `/api/v1/categories` — liste des catégories avec filtres optionnels."
+          }
+        },
+        {
+          "name": "Détail catégorie (+ plats)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/{{categorie}}?disponibles_uniquement=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "categories", "{{categorie}}"],
+              "query": [
+                {
+                  "key": "disponibles_uniquement",
+                  "value": "true",
+                  "description": "Uniquement les plats disponibles"
+                }
+              ]
+            },
+            "description": "GET `/api/v1/categories/{categorie}` — slug ou id. Retourne la catégorie avec ses plats."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plats",
+      "item": [
+        {
+          "name": "Liste et recherche",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/plats?disponibles_uniquement=true",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "plats"],
+              "query": [
+                { "key": "disponibles_uniquement", "value": "true" },
+                { "key": "id_categorie", "value": "", "disabled": true },
+                { "key": "slug_categorie", "value": "", "disabled": true },
+                { "key": "nom_categorie", "value": "", "disabled": true },
+                { "key": "nom", "value": "", "disabled": true, "description": "Recherche partielle sur le nom" },
+                { "key": "description", "value": "", "disabled": true, "description": "Recherche partielle" },
+                { "key": "prix", "value": "", "disabled": true, "description": "Prix exact" },
+                { "key": "prix_min", "value": "", "disabled": true },
+                { "key": "prix_max", "value": "", "disabled": true },
+                { "key": "a_la_une", "value": "true", "disabled": true, "description": "Plats mis en avant" },
+                { "key": "nouveau", "value": "true", "disabled": true, "description": "Alias de nouveautes" },
+                { "key": "nouveautes", "value": "true", "disabled": true, "description": "Nouveautés" }
+              ]
+            },
+            "description": "GET `/api/v1/plats` — activez les paramètres désactivés selon vos tests. Tous les filtres se combinent en ET."
+          }
+        },
+        {
+          "name": "Détail plat",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/plats/{{plat}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "plats", "{{plat}}"]
+            },
+            "description": "GET `/api/v1/plats/{plat}` — slug ou id. Retourne le plat avec catégorie, médias et image principale."
+          }
+        }
+      ]
+    }
+  ]
+}

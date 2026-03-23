@@ -1,0 +1,491 @@
+openapi: 3.0.3
+info:
+  title: API Resto Kwetu
+  description: >
+    API REST du restaurant Resto Kwetu — fiche restaurant, carte (menu),
+    catégories et plats avec médias. Toutes les clés JSON de réponse sont en français.
+  version: 3.1.0
+  contact:
+    name: Resto Kwetu
+    email: contact@restokwetu.com
+
+servers:
+  - url: http://127.0.0.1:3000
+    description: Serveur local de développement
+
+tags:
+  - name: Authentification
+    description: Sanctum Bearer token
+  - name: Restaurant
+    description: Fiche de présentation (CRUD)
+  - name: Menu
+    description: Carte complète (catégories + plats + médias)
+  - name: Catégories
+    description: Sections de la carte
+  - name: Plats
+    description: Plats avec filtres et recherche
+
+paths:
+  # ── Authentification ──────────────────────────────────────────────
+  /api/utilisateur:
+    get:
+      tags: [Authentification]
+      summary: Utilisateur connecté (Sanctum)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Utilisateur authentifié
+        '401':
+          description: Non authentifié
+
+  /api/user:
+    get:
+      tags: [Authentification]
+      summary: Alias anglophone de /api/utilisateur
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Utilisateur authentifié
+        '401':
+          description: Non authentifié
+
+  # ── Restaurant ────────────────────────────────────────────────────
+  /api/v1/restaurant:
+    get:
+      tags: [Restaurant]
+      summary: Liste des restaurants
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+    post:
+      tags: [Restaurant]
+      summary: Créer un restaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInput'
+      responses:
+        '201':
+          description: Créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '422':
+          description: Erreurs de validation
+
+  /api/v1/restaurant/{restaurant}:
+    parameters:
+      - name: restaurant
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [Restaurant]
+      summary: Détail d'un restaurant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Introuvable
+    put:
+      tags: [Restaurant]
+      summary: Mettre à jour un restaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Introuvable
+        '422':
+          description: Erreurs de validation
+    patch:
+      tags: [Restaurant]
+      summary: Mise à jour partielle d'un restaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestaurantInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '404':
+          description: Introuvable
+        '422':
+          description: Erreurs de validation
+    delete:
+      tags: [Restaurant]
+      summary: Supprimer un restaurant
+      responses:
+        '204':
+          description: Supprimé
+        '404':
+          description: Introuvable
+
+  # ── Menu ──────────────────────────────────────────────────────────
+  /api/v1/menu:
+    get:
+      tags: [Menu]
+      summary: Carte complète (catégories actives + plats disponibles + médias)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CategorieAvecPlats'
+
+  # ── Catégories ────────────────────────────────────────────────────
+  /api/v1/categories:
+    get:
+      tags: [Catégories]
+      summary: Liste des catégories
+      parameters:
+        - name: actives
+          in: query
+          description: Filtrer uniquement les catégories actives
+          schema:
+            type: boolean
+            default: true
+        - name: avec_plats
+          in: query
+          description: Inclure les plats dans chaque catégorie
+          schema:
+            type: boolean
+            default: false
+        - name: disponibles_uniquement
+          in: query
+          description: Uniquement les plats disponibles (si avec_plats=true)
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Categorie'
+
+  /api/v1/categories/{categorie}:
+    get:
+      tags: [Catégories]
+      summary: Détail d'une catégorie avec ses plats
+      parameters:
+        - name: categorie
+          in: path
+          required: true
+          description: Slug ou id de la catégorie
+          schema:
+            type: string
+        - name: disponibles_uniquement
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CategorieAvecPlats'
+        '404':
+          description: Introuvable
+
+  # ── Plats ─────────────────────────────────────────────────────────
+  /api/v1/plats:
+    get:
+      tags: [Plats]
+      summary: Liste et recherche de plats
+      parameters:
+        - name: disponibles_uniquement
+          in: query
+          schema:
+            type: boolean
+            default: true
+        - name: id_categorie
+          in: query
+          schema:
+            type: integer
+        - name: slug_categorie
+          in: query
+          schema:
+            type: string
+        - name: nom_categorie
+          in: query
+          schema:
+            type: string
+        - name: nom
+          in: query
+          description: Recherche partielle sur le nom
+          schema:
+            type: string
+        - name: description
+          in: query
+          description: Recherche partielle sur la description
+          schema:
+            type: string
+        - name: prix
+          in: query
+          description: Prix exact
+          schema:
+            type: number
+        - name: prix_min
+          in: query
+          schema:
+            type: number
+        - name: prix_max
+          in: query
+          schema:
+            type: number
+        - name: a_la_une
+          in: query
+          description: Plats mis en avant
+          schema:
+            type: boolean
+        - name: nouveau
+          in: query
+          description: Alias de nouveautes
+          schema:
+            type: boolean
+        - name: nouveautes
+          in: query
+          description: Plats marqués comme nouveautés
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Plat'
+
+  /api/v1/plats/{plat}:
+    get:
+      tags: [Plats]
+      summary: Détail d'un plat
+      parameters:
+        - name: plat
+          in: path
+          required: true
+          description: Slug ou id du plat
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Plat'
+        '404':
+          description: Introuvable
+
+# ── Composants ────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    Restaurant:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+        slogan: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        logo: { type: string, nullable: true, description: URL absolue vers le logo }
+        couverture: { type: string, nullable: true, description: URL absolue vers la couverture }
+        email: { type: string, nullable: true }
+        telephone: { type: string, nullable: true }
+        telephone_secondaire: { type: string, nullable: true }
+        site_web: { type: string, nullable: true }
+        adresse: { type: string, nullable: true }
+        ville: { type: string, nullable: true }
+        code_postal: { type: string, nullable: true }
+        pays: { type: string, nullable: true }
+        latitude: { type: number, nullable: true }
+        longitude: { type: number, nullable: true }
+        code_devise: { type: string }
+        fuseau_horaire: { type: string }
+        horaires:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+          example:
+            Lundi: "08:00 – 22:30"
+            Mardi: "08:00 – 22:30"
+        reseaux_sociaux:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+          example:
+            facebook: "https://facebook.com/restokwetu"
+            instagram: "https://instagram.com/restokwetu"
+
+    RestaurantInput:
+      type: object
+      required: [name, currency_code, timezone]
+      properties:
+        name: { type: string, example: "Resto Kwetu" }
+        slogan: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        logo_path: { type: string, nullable: true }
+        cover_path: { type: string, nullable: true }
+        email: { type: string, format: email, nullable: true }
+        phone: { type: string, nullable: true, example: "+243 892 959 640" }
+        phone_secondary: { type: string, nullable: true }
+        website: { type: string, format: uri, nullable: true }
+        address: { type: string, nullable: true }
+        city: { type: string, nullable: true, example: "Kinshasa" }
+        postal_code: { type: string, nullable: true }
+        country: { type: string, nullable: true, example: "Congo (RDC)" }
+        latitude: { type: number, nullable: true, example: -4.3217 }
+        longitude: { type: number, nullable: true, example: 15.2663 }
+        currency_code: { type: string, minLength: 3, maxLength: 3, example: "USD" }
+        timezone: { type: string, example: "Africa/Kinshasa" }
+        opening_hours:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        social_links:
+          type: object
+          nullable: true
+          additionalProperties: { type: string, format: uri }
+
+    MediaPlat:
+      type: object
+      properties:
+        id: { type: integer }
+        type: { type: string, enum: [photo, video] }
+        url_fichier: { type: string, nullable: true }
+        url_externe: { type: string, nullable: true }
+        est_principale: { type: boolean }
+        ordre: { type: integer }
+        legende: { type: string, nullable: true }
+
+    Categorie:
+      type: object
+      properties:
+        id: { type: integer }
+        nom: { type: string }
+        slug: { type: string }
+        ordre: { type: integer }
+        actif: { type: boolean }
+
+    CategorieAvecPlats:
+      allOf:
+        - $ref: '#/components/schemas/Categorie'
+        - type: object
+          properties:
+            plats:
+              type: array
+              items:
+                $ref: '#/components/schemas/Plat'
+
+    Plat:
+      type: object
+      properties:
+        id: { type: integer }
+        id_categorie: { type: integer, nullable: true }
+        categorie:
+          allOf:
+            - $ref: '#/components/schemas/Categorie'
+          nullable: true
+        nom: { type: string }
+        slug: { type: string }
+        description: { type: string, nullable: true }
+        prix: { type: string }
+        code_devise: { type: string }
+        prix_promo: { type: string, nullable: true }
+        disponible: { type: boolean }
+        mis_en_avant: { type: boolean }
+        nouveau: { type: boolean }
+        minutes_preparation: { type: integer, nullable: true }
+        reference_interne: { type: string, nullable: true }
+        allergenes:
+          type: array
+          items: { type: string }
+        labels_alimentaires:
+          type: array
+          items: { type: string }
+        taux_tva: { type: string, nullable: true }
+        ordre: { type: integer }
+        medias:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaPlat'
+        image_principale:
+          allOf:
+            - $ref: '#/components/schemas/MediaPlat'
+          nullable: true
