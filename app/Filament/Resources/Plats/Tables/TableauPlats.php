@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Plats\Tables;
 
+use App\Support\RestauKwetuUrls;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -25,7 +26,10 @@ class TableauPlats
                     ->label('Photo')
                     ->disk('public')
                     ->visibility('public')
-                    ->height(40),
+                    ->checkFileExistence(false)
+                    ->defaultImageUrl(fn (): string => RestauKwetuUrls::publicLogoUrl())
+                    ->extraImgAttributes(RestauKwetuUrls::imgOnErrorFallbackToLogo())
+                    ->imageHeight(40),
                 TextColumn::make('categorie.name')
                     ->label('Catégorie')
                     ->searchable(),

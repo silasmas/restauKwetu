@@ -284,13 +284,14 @@
     @php
         /** Base URL réelle de la requête (évite APP_URL erronée ex. :3000 alors que vous ouvrez :8000). */
         $rkRoot = rtrim(request()->root(), '/');
+        $rkLogo = $rkRoot.'/assets/logo.jpg';
     @endphp
 </head>
-<body data-menu-url="{{ $rkRoot }}/api/v1/menu">
+<body data-menu-url="{{ $rkRoot }}/api/v1/menu" data-logo-url="{{ $rkLogo }}">
     <header class="rk-topbar">
         <a href="{{ $rkRoot }}/" class="rk-brand">
             <span class="rk-logo-box">
-                <img src="{{ $rkRoot }}/assets/logo.jpg" alt="" width="48" height="48" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');">
+                <img src="{{ $rkLogo }}" alt="" width="48" height="48" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');">
                 <span class="rk-logo-fallback" aria-hidden="true">RK</span>
             </span>
             <span>Resto Kwetu</span>
@@ -349,7 +350,18 @@
                 if (el) el.classList.add('is-visible');
             };
 
+            window.rkOnPlatImgError = function (img) {
+                var logo = document.body.getAttribute('data-logo-url');
+                if (logo && img.getAttribute('data-rk-tried-logo') !== '1') {
+                    img.setAttribute('data-rk-tried-logo', '1');
+                    img.src = logo;
+                    return;
+                }
+                rkOnImgError(img);
+            };
+
             var menuUrl = document.body.getAttribute('data-menu-url');
+            var logoUrl = document.body.getAttribute('data-logo-url') || '';
             var root = document.getElementById('rk-menu-root');
             var searchInput = document.getElementById('rk-search-input');
             var allCategories = [];
@@ -382,13 +394,13 @@
                     html += '<div class="rk-grid">';
 
                     plats.forEach(function (plat) {
-                        var imgUrl = platImageUrl(plat);
+                        var imgUrl = platImageUrl(plat) || logoUrl;
                         var ini = initialsFromName(plat.nom);
                         var price = plat.prix_promo ? '<span style="text-decoration:line-through;opacity:0.6;margin-right:0.35rem">' + escapeHtml(String(plat.prix)) + '</span>' + escapeHtml(String(plat.prix_promo)) : escapeHtml(String(plat.prix));
                         html += '<article class="rk-card" data-plat-id="' + plat.id + '">';
                         html += '<div class="rk-thumb">';
                         if (imgUrl) {
-                            html += '<img src="' + escapeAttr(imgUrl) + '" alt="" loading="lazy" onerror="rkOnImgError(this)">';
+                            html += '<img src="' + escapeAttr(imgUrl) + '" alt="" loading="lazy" onerror="rkOnPlatImgError(this)">';
                             html += '<div class="rk-initials" aria-hidden="true">' + escapeHtml(ini) + '</div>';
                         } else {
                             html += '<div class="rk-initials is-visible" aria-hidden="true">' + escapeHtml(ini) + '</div>';

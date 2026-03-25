@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Plats\RelationManagers;
 
 use App\Models\MediaPlat;
+use App\Support\RestauKwetuUrls;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -94,7 +95,10 @@ class MediasRelationManager extends RelationManager
                     ->label('Aperçu fichier')
                     ->disk('public')
                     ->visibility('public')
-                    ->height(48)
+                    ->checkFileExistence(false)
+                    ->defaultImageUrl(fn (): string => RestauKwetuUrls::publicLogoUrl())
+                    ->extraImgAttributes(RestauKwetuUrls::imgOnErrorFallbackToLogo())
+                    ->imageHeight(48)
                     ->toggleable(),
                 TextColumn::make('file_path')
                     ->label('Chemin fichier')

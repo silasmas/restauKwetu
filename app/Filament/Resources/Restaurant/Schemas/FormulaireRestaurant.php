@@ -41,12 +41,14 @@ class FormulaireRestaurant
                             ->label('Logo')
                             ->disk('public')
                             ->directory('restaurant')
+                            ->visibility('public')
                             ->image()
                             ->nullable(),
                         FileUpload::make('cover_path')
                             ->label('Image de couverture')
                             ->disk('public')
                             ->directory('restaurant')
+                            ->visibility('public')
                             ->image()
                             ->nullable(),
                     ])

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Restaurant\Tables;
 
+use App\Support\RestauKwetuUrls;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -15,7 +16,11 @@ class TableauRestaurant
                 ImageColumn::make('logo_path')
                     ->label('Logo')
                     ->disk('public')
-                    ->height(40),
+                    ->visibility('public')
+                    ->checkFileExistence(false)
+                    ->defaultImageUrl(fn (): string => RestauKwetuUrls::publicLogoUrl())
+                    ->extraImgAttributes(RestauKwetuUrls::imgOnErrorFallbackToLogo())
+                    ->imageHeight(40),
                 TextColumn::make('name')
                     ->label('Nom')
                     ->searchable(),

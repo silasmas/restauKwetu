@@ -36,6 +36,7 @@ class CategoryForm
                             ->label('Image de la catégorie')
                             ->disk('public')
                             ->directory('categories')
+                            ->visibility('public')
                             ->image()
                             ->nullable(),
                         Select::make('type')

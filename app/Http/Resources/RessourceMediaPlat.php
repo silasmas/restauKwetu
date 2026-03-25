@@ -3,8 +3,10 @@
 namespace App\Http\Resources;
 
 use App\Models\MediaPlat;
+use App\Support\RestauKwetuUrls;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Média d’un plat : photo ou vidéo (fichier, URL externe, ou les deux pour une vidéo).
@@ -21,11 +23,28 @@ class RessourceMediaPlat extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type,
-            'url_fichier' => $this->urlFichierPublic(),
+            'url_fichier' => $this->urlFichierPourApi($request),
             'url_externe' => $this->type === MediaPlat::TYPE_VIDEO ? $this->external_url : null,
             'est_principale' => (bool) $this->is_primary,
             'ordre' => $this->sort_order,
             'legende' => $this->caption,
         ];
+    }
+
+    private function urlFichierPourApi(Request $request): ?string
+    {
+        $logo = RestauKwetuUrls::publicLogoUrl($request);
+        $disk = $this->disk ?: 'public';
+        $chemin = $this->file_path;
+
+        if (! is_string($chemin) || $chemin === '') {
+            return $this->type === MediaPlat::TYPE_PHOTO ? $logo : null;
+        }
+
+        if (! Storage::disk($disk)->exists($chemin)) {
+            return $this->type === MediaPlat::TYPE_PHOTO ? $logo : null;
+        }
+
+        return RestauKwetuUrls::publicStorageUrl($chemin, $request);
     }
 }

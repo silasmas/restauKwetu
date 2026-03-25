@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Categories\Tables;
 
 use App\Models\Category;
+use App\Support\RestauKwetuUrls;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -22,7 +23,11 @@ class CategoriesTable
                 ImageColumn::make('image_path')
                     ->label('Image')
                     ->disk('public')
-                    ->height(40),
+                    ->visibility('public')
+                    ->checkFileExistence(false)
+                    ->defaultImageUrl(fn (): string => RestauKwetuUrls::publicLogoUrl())
+                    ->extraImgAttributes(RestauKwetuUrls::imgOnErrorFallbackToLogo())
+                    ->imageHeight(40),
                 TextColumn::make('type')
                     ->label('Famille')
                     ->formatStateUsing(fn (?int $state): string => Category::libellesType()[(int) $state] ?? '—')

@@ -3,8 +3,10 @@
 namespace App\Http\Resources;
 
 use App\Models\Category;
+use App\Support\RestauKwetuUrls;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Représentation JSON d’une catégorie (section de la carte).
@@ -25,7 +27,7 @@ class RessourceCategorie extends JsonResource
             'nom' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'image' => $this->image_path ? asset('storage/'.$this->image_path) : null,
+            'image' => $this->urlImageCarte($request),
             'type' => $type,
             'type_libelle' => match ($type) {
                 Category::TYPE_BOISSON => 'boissons',
@@ -35,5 +37,21 @@ class RessourceCategorie extends JsonResource
             'actif' => (bool) $this->is_active,
             'plats' => RessourcePlat::collection($this->whenLoaded('plats')),
         ];
+    }
+
+    private function urlImageCarte(Request $request): string
+    {
+        $defaut = RestauKwetuUrls::publicLogoUrl($request);
+        $chemin = $this->image_path;
+
+        if (! is_string($chemin) || $chemin === '') {
+            return $defaut;
+        }
+
+        if (! Storage::disk('public')->exists($chemin)) {
+            return $defaut;
+        }
+
+        return RestauKwetuUrls::publicStorageUrl($chemin, $request);
     }
 }

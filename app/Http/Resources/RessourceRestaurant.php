@@ -3,8 +3,10 @@
 namespace App\Http\Resources;
 
 use App\Models\Restaurant;
+use App\Support\RestauKwetuUrls;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Représentation JSON de la fiche restaurant.
@@ -23,8 +25,8 @@ class RessourceRestaurant extends JsonResource
             'nom' => $this->name,
             'slogan' => $this->slogan,
             'description' => $this->description,
-            'logo' => $this->logo_path ? asset('storage/'.$this->logo_path) : null,
-            'couverture' => $this->cover_path ? asset('storage/'.$this->cover_path) : null,
+            'logo' => $this->urlLogo($request),
+            'couverture' => $this->urlCouverture($request),
             'email' => $this->email,
             'telephone' => $this->phone,
             'telephone_secondaire' => $this->phone_secondary,
@@ -40,5 +42,37 @@ class RessourceRestaurant extends JsonResource
             'horaires' => $this->opening_hours,
             'reseaux_sociaux' => $this->social_links,
         ];
+    }
+
+    private function urlLogo(Request $request): string
+    {
+        $defaut = RestauKwetuUrls::publicLogoUrl($request);
+        $chemin = $this->logo_path;
+
+        if (! is_string($chemin) || $chemin === '') {
+            return $defaut;
+        }
+
+        if (! Storage::disk('public')->exists($chemin)) {
+            return $defaut;
+        }
+
+        return RestauKwetuUrls::publicStorageUrl($chemin, $request);
+    }
+
+    private function urlCouverture(Request $request): string
+    {
+        $defaut = RestauKwetuUrls::publicLogoUrl($request);
+        $chemin = $this->cover_path;
+
+        if (! is_string($chemin) || $chemin === '') {
+            return $defaut;
+        }
+
+        if (! Storage::disk('public')->exists($chemin)) {
+            return $defaut;
+        }
+
+        return RestauKwetuUrls::publicStorageUrl($chemin, $request);
     }
 }
