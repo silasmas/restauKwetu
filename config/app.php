@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Jeton pour la route web « storage:link » (déploiement sans SSH)
+    |--------------------------------------------------------------------------
+    |
+    | Définissez STORAGE_LINK_TOKEN dans .env (chaîne longue et aléatoire).
+    | Appel : GET {APP_URL}/systeme/lien-storage?token=VOTRE_JETON
+    |
+    */
+
+    'storage_link_token' => env('STORAGE_LINK_TOKEN'),
+
 ];

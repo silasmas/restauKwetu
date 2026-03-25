@@ -440,6 +440,8 @@ components:
         id: { type: integer }
         nom: { type: string }
         slug: { type: string }
+        description: { type: string, nullable: true }
+        image: { type: string, nullable: true, description: "URL absolue vers l'image" }
         ordre: { type: integer }
         actif: { type: boolean }
 

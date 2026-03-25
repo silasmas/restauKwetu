@@ -20,6 +20,8 @@ class CategoryFactory extends Factory
         return [
             'name' => $label,
             'slug' => Str::slug($label).'-'.fake()->unique()->bothify('??##'),
+            'description' => fake()->optional(0.7)->sentence(12),
+            'image_path' => null,
             'sort_order' => fake()->numberBetween(0, 500),
             'is_active' => fake()->boolean(92),
         ];

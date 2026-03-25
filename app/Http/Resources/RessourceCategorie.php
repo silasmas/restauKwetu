@@ -22,6 +22,8 @@ class RessourceCategorie extends JsonResource
             'id' => $this->id,
             'nom' => $this->name,
             'slug' => $this->slug,
+            'description' => $this->description,
+            'image' => $this->image_path ? asset('storage/'.$this->image_path) : null,
             'ordre' => $this->sort_order,
             'actif' => (bool) $this->is_active,
             'plats' => RessourcePlat::collection($this->whenLoaded('plats')),
