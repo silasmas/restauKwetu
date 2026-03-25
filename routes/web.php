@@ -42,3 +42,6 @@ Route::get('/systeme/lien-storage', function (Request $request) {
         'sortie' => $output !== '' ? $output : null,
     ]);
 })->middleware('throttle:5,1');
+Route::get('/symlink', action: function () {
+    return view('symlink');
+})->name('generate_symlink');
