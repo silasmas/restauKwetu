@@ -15,6 +15,19 @@ use Illuminate\Support\Facades\Storage;
  */
 class RessourceCategorie extends JsonResource
 {
+    public function __construct($resource, private bool $inclurePlatsNested = true)
+    {
+        parent::__construct($resource);
+    }
+
+    /**
+     * Catégorie embarquée dans un plat : sans la clé `plats` (évite récursion / JSON énorme sur le menu).
+     */
+    public static function pourPlatEmbarque(Category $categorie): self
+    {
+        return new self($categorie, inclurePlatsNested: false);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -35,21 +48,23 @@ class RessourceCategorie extends JsonResource
             },
             'ordre' => $this->sort_order,
             'actif' => (bool) $this->is_active,
-            'plats' => RessourcePlat::collection($this->whenLoaded('plats')),
+            'plats' => $this->when(
+                $this->inclurePlatsNested && $this->relationLoaded('plats'),
+                fn () => RessourcePlat::collection($this->plats),
+            ),
         ];
     }
 
-    private function urlImageCarte(Request $request): string
+    private function urlImageCarte(Request $request): ?string
     {
-        $defaut = RestauKwetuUrls::publicLogoUrl($request);
         $chemin = $this->image_path;
 
         if (! is_string($chemin) || $chemin === '') {
-            return $defaut;
+            return null;
         }
 
         if (! Storage::disk('public')->exists($chemin)) {
-            return $defaut;
+            return null;
         }
 
         return RestauKwetuUrls::publicStorageUrl($chemin, $request);

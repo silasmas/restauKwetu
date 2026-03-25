@@ -44,33 +44,31 @@ class RessourceRestaurant extends JsonResource
         ];
     }
 
-    private function urlLogo(Request $request): string
+    private function urlLogo(Request $request): ?string
     {
-        $defaut = RestauKwetuUrls::publicLogoUrl($request);
         $chemin = $this->logo_path;
 
         if (! is_string($chemin) || $chemin === '') {
-            return $defaut;
+            return null;
         }
 
         if (! Storage::disk('public')->exists($chemin)) {
-            return $defaut;
+            return null;
         }
 
         return RestauKwetuUrls::publicStorageUrl($chemin, $request);
     }
 
-    private function urlCouverture(Request $request): string
+    private function urlCouverture(Request $request): ?string
     {
-        $defaut = RestauKwetuUrls::publicLogoUrl($request);
         $chemin = $this->cover_path;
 
         if (! is_string($chemin) || $chemin === '') {
-            return $defaut;
+            return null;
         }
 
         if (! Storage::disk('public')->exists($chemin)) {
-            return $defaut;
+            return null;
         }
 
         return RestauKwetuUrls::publicStorageUrl($chemin, $request);

@@ -33,16 +33,15 @@ class RessourceMediaPlat extends JsonResource
 
     private function urlFichierPourApi(Request $request): ?string
     {
-        $logo = RestauKwetuUrls::publicLogoUrl($request);
         $disk = $this->disk ?: 'public';
         $chemin = $this->file_path;
 
         if (! is_string($chemin) || $chemin === '') {
-            return $this->type === MediaPlat::TYPE_PHOTO ? $logo : null;
+            return null;
         }
 
         if (! Storage::disk($disk)->exists($chemin)) {
-            return $this->type === MediaPlat::TYPE_PHOTO ? $logo : null;
+            return null;
         }
 
         return RestauKwetuUrls::publicStorageUrl($chemin, $request);

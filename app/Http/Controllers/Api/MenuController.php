@@ -22,7 +22,7 @@ class MenuController extends Controller
             ->orderBy('sort_order')
             ->with([
                 'plats' => function ($q): void {
-                    $q->disponibles()->orderBy('sort_order')->with(['medias', 'imagePrincipale']);
+                    $q->disponibles()->orderBy('sort_order')->with(['categorie', 'medias', 'imagePrincipale']);
                 },
             ])
             ->get();

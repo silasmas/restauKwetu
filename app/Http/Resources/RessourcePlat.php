@@ -21,7 +21,9 @@ class RessourcePlat extends JsonResource
         return [
             'id' => $this->id,
             'id_categorie' => $this->category_id,
-            'categorie' => RessourceCategorie::make($this->whenLoaded('categorie')),
+            'categorie' => $this->categorie !== null
+                ? RessourceCategorie::pourPlatEmbarque($this->categorie)
+                : null,
             'nom' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
