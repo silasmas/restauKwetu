@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $this->call(RestaurantMenuSeeder::class);
+        $this->call([
+            RestaurantSeeder::class,
+            RestoKwetuCatalogueSeeder::class,
+        ]);
     }
 }

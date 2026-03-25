@@ -216,10 +216,16 @@
                   "key": "disponibles_uniquement",
                   "value": "true",
                   "description": "Uniquement les plats disponibles (si avec_plats)"
+                },
+                {
+                  "key": "type",
+                  "value": "1",
+                  "description": "1 = aliments, 2 = boissons",
+                  "disabled": true
                 }
               ]
             },
-            "description": "GET `/api/v1/categories` — liste des catégories avec filtres optionnels."
+            "description": "GET `/api/v1/categories` — filtres optionnels dont `type` (1 aliments, 2 boissons)."
           }
         },
         {

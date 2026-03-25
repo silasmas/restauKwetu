@@ -38,7 +38,7 @@ class RestaurantSeeder extends Seeder
             ],
             'social_links' => [
                 'facebook' => 'https://facebook.com/restokwetu',
-                'instagram' => 'https://instagram.com/restokwetu',
+                'instagram' => 'https://www.instagram.com/resto.kwetu/',
             ],
         ]);
     }

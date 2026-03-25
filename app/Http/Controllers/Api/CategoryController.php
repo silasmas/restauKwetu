@@ -26,6 +26,13 @@ class CategoryController extends Controller
             $query->actives();
         }
 
+        if ($request->filled('type')) {
+            $type = (int) $request->query('type');
+            if (in_array($type, [Category::TYPE_ALIMENT, Category::TYPE_BOISSON], true)) {
+                $query->ofType($type);
+            }
+        }
+
         if ($request->boolean('avec_plats')) {
             $query->with(['plats' => function ($q) use ($request): void {
                 $q->orderBy('sort_order');

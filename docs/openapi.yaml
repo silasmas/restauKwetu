@@ -209,6 +209,12 @@ paths:
           schema:
             type: boolean
             default: true
+        - name: type
+          in: query
+          description: "1 = aliments, 2 = boissons"
+          schema:
+            type: integer
+            enum: [1, 2]
       responses:
         '200':
           description: OK
@@ -442,6 +448,8 @@ components:
         slug: { type: string }
         description: { type: string, nullable: true }
         image: { type: string, nullable: true, description: "URL absolue vers l'image" }
+        type: { type: integer, enum: [1, 2], description: "1 aliments, 2 boissons" }
+        type_libelle: { type: string, enum: [aliments, boissons] }
         ordre: { type: integer }
         actif: { type: boolean }
 

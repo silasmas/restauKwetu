@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Categories\Schemas;
 
+use App\Models\Category;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -36,6 +38,12 @@ class CategoryForm
                             ->directory('categories')
                             ->image()
                             ->nullable(),
+                        Select::make('type')
+                            ->label('Famille')
+                            ->options(Category::libellesType())
+                            ->required()
+                            ->default(Category::TYPE_ALIMENT)
+                            ->native(false),
                     ])
                     ->columns(2),
 

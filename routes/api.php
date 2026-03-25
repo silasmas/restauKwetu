@@ -34,7 +34,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/menu', MenuController::class);
 
     /**
-     * GET /api/v1/categories — Paramètres : actives, avec_plats, disponibles_uniquement.
+     * GET /api/v1/categories — Paramètres : actives, avec_plats, disponibles_uniquement, type (1 aliments, 2 boissons).
      */
     Route::get('/categories', [CategoryController::class, 'index']);
 
