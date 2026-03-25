@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Support\RestauKwetuUrls;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -15,9 +16,19 @@ use Illuminate\Support\Facades\Storage;
  */
 class RessourceCategorie extends JsonResource
 {
-    public function __construct($resource, private bool $inclurePlatsNested = true)
+    private bool $inclurePlatsNested;
+
+    /**
+     * @param  mixed  $resource
+     * @param  bool|int|string  $inclurePlatsOuCleCollection  bool explicite depuis {@see pourPlatEmbarque()} ; sinon ignoré
+     *                                                        (Laravel {@see Collection::mapInto} passe la clé de collection en 2ᵉ argument : pour l’index 0, ce serait 0 et serait converti en false si ce paramètre était un bool typé).
+     */
+    public function __construct($resource, mixed $inclurePlatsOuCleCollection = true)
     {
         parent::__construct($resource);
+        $this->inclurePlatsNested = is_bool($inclurePlatsOuCleCollection)
+            ? $inclurePlatsOuCleCollection
+            : true;
     }
 
     /**
@@ -25,7 +36,7 @@ class RessourceCategorie extends JsonResource
      */
     public static function pourPlatEmbarque(Category $categorie): self
     {
-        return new self($categorie, inclurePlatsNested: false);
+        return new self($categorie, false);
     }
 
     /**
