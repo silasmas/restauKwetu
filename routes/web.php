@@ -5,8 +5,11 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return response()
+        ->view('welcome')
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache');
+})->name('home');
 
 /**
  * Crée le lien symbolique public/storage → storage/app/public (équivalent à `php artisan storage:link`).

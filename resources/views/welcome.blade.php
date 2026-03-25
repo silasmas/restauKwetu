@@ -281,12 +281,16 @@
             .rk-nav { justify-content: center; }
         }
     </style>
+    @php
+        /** Base URL réelle de la requête (évite APP_URL erronée ex. :3000 alors que vous ouvrez :8000). */
+        $rkRoot = rtrim(request()->root(), '/');
+    @endphp
 </head>
-<body data-menu-url="{{ url('/api/v1/menu') }}">
+<body data-menu-url="{{ $rkRoot }}/api/v1/menu">
     <header class="rk-topbar">
-        <a href="{{ url('/') }}" class="rk-brand">
+        <a href="{{ $rkRoot }}/" class="rk-brand">
             <span class="rk-logo-box">
-                <img src="{{ asset('assets/logo.jpg') }}" alt="" width="48" height="48" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');">
+                <img src="{{ $rkRoot }}/assets/logo.jpg" alt="" width="48" height="48" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.add('is-visible');">
                 <span class="rk-logo-fallback" aria-hidden="true">RK</span>
             </span>
             <span>Resto Kwetu</span>
@@ -302,9 +306,9 @@
         <nav class="rk-nav">
             @if (Route::has('login'))
                 @auth
-                    <a href="{{ url('/admin') }}">Admin</a>
+                    <a href="/admin">Admin</a>
                 @else
-                    <a href="{{ route('login') }}">Connexion</a>
+                    <a href="{{ route('login', [], false) }}">Connexion</a>
                 @endauth
             @endif
         </nav>
