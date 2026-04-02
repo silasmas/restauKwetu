@@ -11,6 +11,13 @@ Route::get('/', function () {
         ->header('Pragma', 'no-cache');
 })->name('home');
 
+Route::get('/carte-livre', function () {
+    return response()
+        ->view('welcome-menu-book')
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache');
+})->name('menu.livre');
+
 /**
  * Crée le lien symbolique public/storage → storage/app/public (équivalent à `php artisan storage:link`).
  * Protégé par STORAGE_LINK_TOKEN dans .env ; désactivé si le jeton est vide.
@@ -32,7 +39,7 @@ Route::get('/systeme/lien-storage', function (Request $request) {
     try {
         Artisan::call('storage:link', ['--force' => true]);
         $output = trim(Artisan::output());
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response()->json([
             'ok' => false,
             'message' => config('app.debug') ? $e->getMessage() : 'Échec de la création du lien.',

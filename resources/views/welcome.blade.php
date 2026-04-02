@@ -272,6 +272,174 @@
 
         .rk-error { color: #e8a598; }
 
+        .rk-thumb { position: relative; }
+
+        .rk-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.28);
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .rk-card:hover .rk-play-overlay,
+        .rk-play-overlay.is-always {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .rk-open-video {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: rgba(200, 70, 40, 0.92);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+            transition: transform 0.15s, background 0.15s;
+        }
+
+        .rk-open-video:hover {
+            transform: scale(1.06);
+            background: var(--rk-accent-hover);
+        }
+
+        .rk-open-video svg {
+            width: 1.35rem;
+            height: 1.35rem;
+            margin-left: 2px;
+        }
+
+        .rk-card-actions {
+            margin-top: 0.65rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .rk-btn-video-text {
+            font: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--rk-accent);
+            background: rgba(200, 70, 40, 0.15);
+            color: var(--rk-accent-hover);
+            cursor: pointer;
+        }
+
+        .rk-btn-video-text:hover {
+            background: rgba(200, 70, 40, 0.28);
+        }
+
+        /* Modal média */
+        .rk-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .rk-modal.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .rk-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 6, 5, 0.82);
+            cursor: pointer;
+        }
+
+        .rk-modal-panel {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: min(960px, 100vw - 2rem);
+            max-height: min(85vh, 900px);
+            background: var(--rk-bg-elevated);
+            border-radius: 14px;
+            border: 1px solid var(--rk-border);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .rk-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--rk-border);
+        }
+
+        .rk-modal-head h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--rk-text);
+            line-height: 1.3;
+        }
+
+        .rk-modal-close {
+            flex-shrink: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--rk-text);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .rk-modal-close:hover {
+            background: rgba(200, 70, 40, 0.35);
+        }
+
+        .rk-modal-stage {
+            position: relative;
+            flex: 1;
+            min-height: min(50vh, 360px);
+            aspect-ratio: 16 / 10;
+            max-height: 70vh;
+            background: #0d0a09;
+        }
+
+        .rk-modal-stage iframe,
+        .rk-modal-stage video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        .rk-modal-stage video {
+            object-fit: contain;
+        }
+
         @media (max-width: 768px) {
             .rk-topbar {
                 grid-template-columns: 1fr;
@@ -305,6 +473,7 @@
             </div>
         </div>
         <nav class="rk-nav">
+            <a href="{{ route('menu.livre') }}">Carte livre</a>
             @if (Route::has('login'))
                 @auth
                     <a href="/admin">Admin</a>
@@ -321,6 +490,17 @@
             <p class="rk-empty">Chargement de la carte…</p>
         </div>
     </main>
+
+    <div id="rk-media-modal" class="rk-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rk-media-modal-title">
+        <div class="rk-modal-backdrop" data-rk-modal-close tabindex="-1"></div>
+        <div class="rk-modal-panel">
+            <div class="rk-modal-head">
+                <h2 id="rk-media-modal-title">Vidéo</h2>
+                <button type="button" class="rk-modal-close" data-rk-modal-close aria-label="Fermer la vidéo">&times;</button>
+            </div>
+            <div class="rk-modal-stage" id="rk-media-modal-stage"></div>
+        </div>
+    </div>
 
     <script>
         (function () {
@@ -343,6 +523,106 @@
                 }
                 return '';
             }
+
+            function youTubeEmbedFromUrl(url) {
+                try {
+                    var u = new URL(url);
+                    var host = u.hostname.replace(/^www\./, '');
+                    if (host === 'youtu.be') {
+                        var id = u.pathname.replace(/^\//, '').split('/')[0];
+                        if (id) return 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0';
+                    }
+                    if (host.indexOf('youtube.com') !== -1) {
+                        var vid = u.searchParams.get('v');
+                        if (!vid && u.pathname.indexOf('/embed/') !== -1) {
+                            vid = u.pathname.split('/embed/')[1];
+                        }
+                        if (vid) return 'https://www.youtube.com/embed/' + encodeURIComponent(vid.split('/')[0]) + '?autoplay=1&rel=0';
+                    }
+                } catch (e) {}
+                return null;
+            }
+
+            function vimeoEmbedFromUrl(url) {
+                try {
+                    var u = new URL(url);
+                    var host = u.hostname.replace(/^www\./, '');
+                    if (host !== 'vimeo.com' && host !== 'player.vimeo.com') return null;
+                    var parts = u.pathname.split('/').filter(Boolean);
+                    var id = parts[parts.length - 1];
+                    if (id && /^\d+$/.test(id)) return 'https://player.vimeo.com/video/' + id + '?autoplay=1';
+                } catch (e) {}
+                return null;
+            }
+
+            /** @returns {{ kind: string, src: string }|null} */
+            function platVideoPresentation(plat) {
+                if (!Array.isArray(plat.medias)) return null;
+                var v = plat.medias.find(function (m) {
+                    return m.type === 'video' && (m.url_fichier || m.url_externe);
+                });
+                if (!v) return null;
+                if (v.url_fichier) return { kind: 'file', src: v.url_fichier };
+                if (v.url_externe) {
+                    var ext = String(v.url_externe).trim();
+                    var yt = youTubeEmbedFromUrl(ext);
+                    if (yt) return { kind: 'iframe', src: yt };
+                    var vm = vimeoEmbedFromUrl(ext);
+                    if (vm) return { kind: 'iframe', src: vm };
+                    return { kind: 'file', src: ext };
+                }
+                return null;
+            }
+
+            var mediaModal = document.getElementById('rk-media-modal');
+            var mediaModalStage = document.getElementById('rk-media-modal-stage');
+            var mediaModalTitle = document.getElementById('rk-media-modal-title');
+
+            function closeMediaModal() {
+                if (!mediaModal || !mediaModalStage) return;
+                mediaModal.classList.remove('is-open');
+                mediaModal.setAttribute('aria-hidden', 'true');
+                mediaModalStage.innerHTML = '';
+                document.body.style.overflow = '';
+            }
+
+            function openMediaModal(title, presentation) {
+                if (!mediaModal || !mediaModalStage || !presentation || !presentation.src) return;
+                mediaModalStage.innerHTML = '';
+                if (mediaModalTitle) mediaModalTitle.textContent = title || 'Vidéo';
+                if (presentation.kind === 'iframe') {
+                    var ifr = document.createElement('iframe');
+                    ifr.setAttribute('src', presentation.src);
+                    ifr.setAttribute('title', title || 'Vidéo');
+                    ifr.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                    ifr.setAttribute('allowfullscreen', '');
+                    mediaModalStage.appendChild(ifr);
+                } else {
+                    var vid = document.createElement('video');
+                    vid.setAttribute('controls', '');
+                    vid.setAttribute('playsinline', '');
+                    vid.src = presentation.src;
+                    mediaModalStage.appendChild(vid);
+                    vid.play().catch(function () {});
+                }
+                mediaModal.classList.add('is-open');
+                mediaModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+
+            document.addEventListener('click', function (e) {
+                var closeEl = e.target.closest('[data-rk-modal-close]');
+                if (closeEl) {
+                    e.preventDefault();
+                    closeMediaModal();
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && mediaModal && mediaModal.classList.contains('is-open')) {
+                    closeMediaModal();
+                }
+            });
 
             window.rkOnImgError = function (img) {
                 img.classList.add('is-hidden');
@@ -397,6 +677,7 @@
                         var imgUrl = platImageUrl(plat) || logoUrl;
                         var ini = initialsFromName(plat.nom);
                         var price = plat.prix_promo ? '<span style="text-decoration:line-through;opacity:0.6;margin-right:0.35rem">' + escapeHtml(String(plat.prix)) + '</span>' + escapeHtml(String(plat.prix_promo)) : escapeHtml(String(plat.prix));
+                        var vidPres = platVideoPresentation(plat);
                         html += '<article class="rk-card" data-plat-id="' + plat.id + '">';
                         html += '<div class="rk-thumb">';
                         if (imgUrl) {
@@ -405,12 +686,21 @@
                         } else {
                             html += '<div class="rk-initials is-visible" aria-hidden="true">' + escapeHtml(ini) + '</div>';
                         }
+                        if (vidPres) {
+                            html += '<div class="rk-play-overlay is-always">';
+                            html += '<button type="button" class="rk-open-video" data-rk-open-video="1" data-rk-v-kind="' + escapeAttr(vidPres.kind) + '" data-rk-v-src="' + escapeAttr(vidPres.src) + '" data-rk-v-title="' + escapeAttr(plat.nom) + '" aria-label="Voir la vidéo : ' + escapeAttr(plat.nom) + '">';
+                            html += '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+                            html += '</button></div>';
+                        }
                         html += '</div><div class="rk-card-body">';
                         if (plat.mis_en_avant) html += '<span class="rk-badge">À la une</span>';
                         if (plat.nouveau) html += '<span class="rk-badge">Nouveau</span>';
                         html += '<h3>' + escapeHtml(plat.nom) + '</h3>';
                         if (plat.description) html += '<p>' + escapeHtml(plat.description) + '</p>';
                         html += '<div class="rk-price">' + price + ' ' + escapeHtml(plat.code_devise || '') + '</div>';
+                        if (vidPres) {
+                            html += '<div class="rk-card-actions"><button type="button" class="rk-btn-video-text rk-open-video" data-rk-open-video="1" data-rk-v-kind="' + escapeAttr(vidPres.kind) + '" data-rk-v-src="' + escapeAttr(vidPres.src) + '" data-rk-v-title="' + escapeAttr(plat.nom) + '">Voir la vidéo</button></div>';
+                        }
                         html += '</div></article>';
                     });
 
@@ -422,6 +712,16 @@
                     return;
                 }
                 root.innerHTML = html;
+                root.querySelectorAll('.rk-open-video').forEach(function (btn) {
+                    btn.addEventListener('click', function (ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        var kind = btn.getAttribute('data-rk-v-kind');
+                        var src = btn.getAttribute('data-rk-v-src');
+                        var t = btn.getAttribute('data-rk-v-title') || 'Vidéo';
+                        if (kind && src) openMediaModal(t, { kind: kind, src: src });
+                    });
+                });
             }
 
             function escapeHtml(s) {
