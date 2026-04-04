@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\PlatController;
 use App\Http\Controllers\Api\RestaurantController;
+use App\Http\Controllers\Api\UtilisateurController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -53,4 +54,16 @@ Route::prefix('v1')->group(function (): void {
      * GET /api/v1/plats/{plat} — Slug ou id.
      */
     Route::get('/plats/{plat}', [PlatController::class, 'show']);
+
+    /**
+     * CRUD /api/v1/utilisateurs — Sanctum requis (name, email, password + password_confirmation).
+     */
+    Route::middleware('auth:sanctum')->group(function (): void {
+        Route::get('/utilisateurs', [UtilisateurController::class, 'index']);
+        Route::post('/utilisateurs', [UtilisateurController::class, 'store']);
+        Route::get('/utilisateurs/{user}', [UtilisateurController::class, 'show']);
+        Route::put('/utilisateurs/{user}', [UtilisateurController::class, 'update']);
+        Route::patch('/utilisateurs/{user}', [UtilisateurController::class, 'update']);
+        Route::delete('/utilisateurs/{user}', [UtilisateurController::class, 'destroy']);
+    });
 });
