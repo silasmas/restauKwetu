@@ -449,38 +449,6 @@
             .rk-nav { justify-content: center; }
         }
 
-        /* Statistiques carte (données issues du même JSON que la grille) */
-        .rk-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.75rem;
-            margin: 0 0 1.5rem;
-            padding: 0;
-            list-style: none;
-        }
-        .rk-stats li {
-            background: var(--rk-card);
-            border: 1px solid var(--rk-border);
-            border-radius: 12px;
-            padding: 0.85rem 1rem;
-        }
-        .rk-stats .rk-stat-value {
-            font-size: 1.65rem;
-            font-weight: 700;
-            color: var(--rk-accent);
-            line-height: 1.1;
-        }
-        .rk-stats .rk-stat-label {
-            font-size: 0.8rem;
-            color: var(--rk-text-muted);
-            margin-top: 0.25rem;
-        }
-        .rk-stats .rk-stat-detail {
-            font-size: 0.75rem;
-            color: var(--rk-text-muted);
-            margin-top: 0.5rem;
-            line-height: 1.35;
-        }
     </style>
     @php
         /** Base URL réelle de la requête (évite APP_URL erronée ex. :3000 alors que vous ouvrez :8000). */
@@ -521,7 +489,7 @@
 
     <main class="rk-main">
         <p class="rk-lead">Lounge bar, terrasse-piscine et salon privé — découvrez notre carte.</p>
-        <ul id="rk-stats-section" class="rk-stats" hidden aria-live="polite"></ul>
+        @include('partials.rk-restaurant-infos-widget', ['theme' => 'grid'])
         <div id="rk-menu-root">
             <p class="rk-empty">Chargement de la carte…</p>
         </div>
@@ -691,42 +659,6 @@
                 return [];
             }
 
-            function renderStatsStrip(categories) {
-                var wrap = document.getElementById('rk-stats-section');
-                if (!wrap) return;
-                var nPlat = 0;
-                var nUne = 0;
-                var nNew = 0;
-                var nPromo = 0;
-                var nAvecPhoto = 0;
-                var nAvecVideo = 0;
-                categories.forEach(function (cat) {
-                    (cat.plats || []).forEach(function (p) {
-                        nPlat++;
-                        if (p.mis_en_avant) nUne++;
-                        if (p.nouveau) nNew++;
-                        if (p.prix_promo != null && String(p.prix_promo) !== '') nPromo++;
-                        if (platImageUrl(p)) nAvecPhoto++;
-                        if (platVideoPresentation(p)) nAvecVideo++;
-                    });
-                });
-                var nCat = categories.length;
-                var parts = [
-                    { v: String(nCat), l: 'Sections carte', d: 'Catégories actives renvoyées par l’API menu.' },
-                    { v: String(nPlat), l: 'Plats affichés', d: 'Plats disponibles regroupés par section.' },
-                    { v: String(nUne), l: 'À la une', d: 'Mis en avant sur la carte publique.' },
-                    { v: String(nNew), l: 'Nouveautés', d: 'Marqués comme nouveaux.' },
-                    { v: String(nPromo), l: 'En promotion', d: 'Prix promotionnel renseigné.' },
-                    { v: String(nAvecPhoto), l: 'Avec visuel', d: 'Photo principale ou média image.' },
-                    { v: String(nAvecVideo), l: 'Avec vidéo', d: 'Lien ou fichier vidéo associé.' },
-                ];
-                wrap.innerHTML = parts.map(function (x) {
-                    return '<li><div class="rk-stat-value">' + escapeHtml(x.v) + '</div>'
-                        + '<div class="rk-stat-label">' + escapeHtml(x.l) + '</div>'
-                        + '<div class="rk-stat-detail">' + escapeHtml(x.d) + '</div></li>';
-                }).join('');
-                wrap.hidden = nPlat === 0 && nCat === 0;
-            }
             var root = document.getElementById('rk-menu-root');
             var searchInput = document.getElementById('rk-search-input');
             var allCategories = [];
@@ -835,10 +767,8 @@
                     allCategories = categoriesFromMenuPayload(payload);
                     if (!allCategories.length) {
                         root.innerHTML = '<p class="rk-empty">La carte est vide pour le moment.</p>';
-                        renderStatsStrip([]);
                         return;
                     }
-                    renderStatsStrip(allCategories);
                     render();
                 })
                 .catch(function () {

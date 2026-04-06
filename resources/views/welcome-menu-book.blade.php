@@ -644,6 +644,8 @@
         </nav>
     </header>
 
+    @include('partials.rk-restaurant-infos-widget', ['theme' => 'livre'])
+
     <div class="rk-stage">
         <div class="rk-book-outer">
             <div class="rk-book">
