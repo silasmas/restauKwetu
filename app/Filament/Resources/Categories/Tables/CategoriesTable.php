@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Categories\Tables;
 use App\Models\Category;
 use App\Support\RestauKwetuUrls;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -35,26 +37,41 @@ class CategoriesTable
                     ->sortable(),
                 TextColumn::make('name')
                     ->label('Nom')
-                    ->searchable(),
+                    ->searchable()
+                    ->weight('medium'),
+                TextColumn::make('plats_count')
+                    ->label('Plats')
+                    ->numeric()
+                    ->sortable()
+                    ->alignEnd(),
+                TextColumn::make('slug')
+                    ->label('Slug')
+                    ->searchable()
+                    ->limit(24)
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('description')
                     ->label('Description')
-                    ->limit(40)
-                    ->toggleable(),
-                TextColumn::make('slug')
-                    ->searchable(),
+                    ->limit(48)
+                    ->tooltip(fn ($record): ?string => filled($record->description) ? (string) $record->description : null)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sort_order')
                     ->label('Ordre')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->alignCenter(),
                 IconColumn::make('is_active')
                     ->label('Active')
-                    ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->boolean()
+                    ->alignCenter(),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Modifié')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('created_at')
+                    ->label('Créé le')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -66,7 +83,9 @@ class CategoriesTable
                     ->label('Active'),
             ])
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

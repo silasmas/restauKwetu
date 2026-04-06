@@ -612,9 +612,10 @@
     @php
         $rkRoot = rtrim(request()->root(), '/');
         $rkLogo = $rkRoot.'/assets/logo.jpg';
+        $rkApiBase = rtrim(request()->getBasePath(), '/');
     @endphp
 </head>
-<body data-menu-url="{{ $rkRoot }}/api/v1/menu" data-logo-url="{{ $rkLogo }}">
+<body data-rk-api-base="{{ $rkApiBase }}" data-logo-url="{{ $rkLogo }}">
     <header class="rk-topbar">
         <a href="{{ route('home') }}" class="rk-brand">
             <span class="rk-logo-box">
@@ -674,7 +675,18 @@
 
     <script>
         (function () {
-            var menuUrl = document.body.getAttribute('data-menu-url');
+            function menuEndpointUrl() {
+                var base = document.body.getAttribute('data-rk-api-base') || '';
+                return window.location.origin + base + '/api/v1/menu';
+            }
+
+            function categoriesFromMenuPayload(payload) {
+                if (!payload || typeof payload !== 'object') return [];
+                if (Array.isArray(payload)) return payload;
+                if (Array.isArray(payload.data)) return payload.data;
+                return [];
+            }
+
             var logoUrl = document.body.getAttribute('data-logo-url') || '';
             var pageEl = document.getElementById('rk-book-page');
             var swipeZone = document.getElementById('rk-book-swipe-zone');
@@ -1031,13 +1043,13 @@
                 goToPage(newIdx, false);
             }
 
-            fetch(menuUrl, { headers: { 'Accept': 'application/json' } })
+            fetch(menuEndpointUrl(), { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
                 .then(function (r) {
                     if (!r.ok) throw new Error('HTTP ' + r.status);
                     return r.json();
                 })
                 .then(function (payload) {
-                    allCategories = payload.data || [];
+                    allCategories = categoriesFromMenuPayload(payload);
                     if (!allCategories.length) {
                         pageEl.innerHTML = '<p class="rk-empty">La carte est vide pour le moment.</p>';
                         pages = [{ type: 'empty', message: 'La carte est vide pour le moment.' }];

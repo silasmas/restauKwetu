@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Restaurant;
 use App\Filament\Resources\Restaurant\Pages\CreerRestaurant;
 use App\Filament\Resources\Restaurant\Pages\ListeRestaurants;
 use App\Filament\Resources\Restaurant\Pages\ModifierRestaurant;
+use App\Filament\Resources\Restaurant\Pages\VoirRestaurant;
 use App\Filament\Resources\Restaurant\Schemas\FormulaireRestaurant;
+use App\Filament\Resources\Restaurant\Schemas\RestaurantInfolist;
 use App\Filament\Resources\Restaurant\Tables\TableauRestaurant;
 use App\Models\Restaurant;
 use BackedEnum;
@@ -32,6 +34,11 @@ class RestaurantResource extends Resource
         return FormulaireRestaurant::configure($schema);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return RestaurantInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return TableauRestaurant::configure($table);
@@ -47,6 +54,7 @@ class RestaurantResource extends Resource
         return [
             'index' => ListeRestaurants::route('/'),
             'create' => CreerRestaurant::route('/create'),
+            'view' => VoirRestaurant::route('/{record}'),
             'edit' => ModifierRestaurant::route('/{record}/edit'),
         ];
     }

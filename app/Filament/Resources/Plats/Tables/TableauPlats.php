@@ -4,8 +4,10 @@ namespace App\Filament\Resources\Plats\Tables;
 
 use App\Support\RestauKwetuUrls;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
@@ -32,61 +34,76 @@ class TableauPlats
                     ->imageHeight(40),
                 TextColumn::make('categorie.name')
                     ->label('Catégorie')
-                    ->searchable(),
+                    ->searchable()
+                    ->placeholder('—')
+                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nom')
-                    ->searchable(),
-                TextColumn::make('slug')
-                    ->label('Slug')
-                    ->searchable(),
+                    ->searchable()
+                    ->weight('medium'),
                 TextColumn::make('price')
                     ->label('Prix')
                     ->formatStateUsing(fn ($state, $record): string => number_format((float) $state, 2, ',', ' ').' '.$record->currency_code)
                     ->sortable(),
-                TextColumn::make('currency_code')
-                    ->label('Devise')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('promo_price')
                     ->label('Promo')
                     ->formatStateUsing(fn ($state, $record): ?string => $state === null ? null : number_format((float) $state, 2, ',', ' ').' '.$record->currency_code)
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_available')
                     ->label('Dispo.')
-                    ->boolean(),
+                    ->boolean()
+                    ->alignCenter(),
                 IconColumn::make('is_featured')
-                    ->label('À la une')
-                    ->boolean(),
+                    ->label('Une')
+                    ->boolean()
+                    ->alignCenter(),
                 IconColumn::make('is_new')
                     ->label('Nouv.')
-                    ->boolean(),
+                    ->boolean()
+                    ->alignCenter(),
+                TextColumn::make('slug')
+                    ->label('Slug')
+                    ->searchable()
+                    ->limit(20)
+                    ->copyable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('sku')
+                    ->label('Réf.')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('preparation_minutes')
                     ->label('Prép. (min)')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('sku')
-                    ->label('Réf.')
-                    ->searchable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tva_rate')
                     ->label('TVA %')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sort_order')
                     ->label('Ordre')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label('Créé le')
-                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('currency_code')
+                    ->label('Devise')
+                    ->badge()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->label('Modifié le')
-                    ->dateTime()
+                    ->label('Modifié')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('created_at')
+                    ->label('Créé le')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
-                    ->label('Supprimé le')
-                    ->dateTime()
+                    ->label('Corbeille')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -103,7 +120,9 @@ class TableauPlats
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

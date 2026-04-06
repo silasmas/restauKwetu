@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Plats;
 use App\Filament\Resources\Plats\Pages\CreerPlat;
 use App\Filament\Resources\Plats\Pages\ListePlats;
 use App\Filament\Resources\Plats\Pages\ModifierPlat;
+use App\Filament\Resources\Plats\Pages\VoirPlat;
 use App\Filament\Resources\Plats\RelationManagers\MediasRelationManager;
 use App\Filament\Resources\Plats\Schemas\FormulairePlat;
+use App\Filament\Resources\Plats\Schemas\PlatInfolist;
 use App\Filament\Resources\Plats\Tables\TableauPlats;
 use App\Models\Plat;
 use BackedEnum;
@@ -35,6 +37,11 @@ class PlatResource extends Resource
         return FormulairePlat::configure($schema);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return PlatInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return TableauPlats::configure($table);
@@ -52,6 +59,7 @@ class PlatResource extends Resource
         return [
             'index' => ListePlats::route('/'),
             'create' => CreerPlat::route('/create'),
+            'view' => VoirPlat::route('/{record}'),
             'edit' => ModifierPlat::route('/{record}/edit'),
         ];
     }
